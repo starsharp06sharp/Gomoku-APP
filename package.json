@@ -1,0 +1,23 @@
+{
+  "name": "starsharp06sharp.gomoku",
+  "displayName": "Gomoku",
+  "version": "0.1.0",
+  "description": "A offline Gomoku Game APP.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Apache Cordova Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cordova-browser": "^7.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "browser"
+    ]
+  }
+}
