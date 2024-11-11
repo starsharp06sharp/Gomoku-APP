@@ -9,4 +9,7 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <preference name="orientation" value="landscape" />
+    <platform name="android">
+        <preference name="android-minSdkVersion" value="29" />
+    </platform>
 </widget>
