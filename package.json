@@ -1,7 +1,7 @@
 {
   "name": "starsharp06sharp.gomoku",
   "displayName": "Gomoku",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "A offline Gomoku Game APP.",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "keywords": [
     "ecosystem:cordova"
   ],
-  "author": "Apache Cordova Team",
+  "author": "Zheng Lei",
   "license": "Apache-2.0",
   "devDependencies": {
     "cordova-android": "^13.0.0",
