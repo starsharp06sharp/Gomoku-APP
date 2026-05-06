@@ -75,11 +75,8 @@ function Game(boardElm, boardBackgroundElm){
     this.undo = function(){
         if(!playing){
             if(!history.length)return;
-            var last = history.pop();
-            board.unsetGo(last.r,last.c);
-            white.watch(last.r,last.c,'remove');
-            black.watch(last.r,last.c,'remove');
-            return;
+            playing = true;
+            board.clearWin();
         }
         do{
             if(!history.length)return;
