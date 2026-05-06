@@ -1,0 +1,9 @@
+{
+  "android": {
+    "release": {
+      "keystore": "./my-release-key.jks",
+      "alias": "vert-num",
+      "packageType": "apk"
+    }
+  }
+}

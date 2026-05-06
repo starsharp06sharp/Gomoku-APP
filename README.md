@@ -67,13 +67,23 @@ cordova run browser
 cordova run android
 ```
 
-仅构建 APK：
+仅构建 Debug APK：
 
 ```bash
 cordova build android
 ```
 
-构建产物位于 `platforms/android/app/build/outputs/apk/` 目录下。
+构建产物位于 `platforms/android/app/build/outputs/apk/debug/` 目录下。
+
+### 构建签名 Release APK
+
+首次需要用 `keytool` 生成 keystore（项目根目录的 `build.json` 已配置好 keystore 路径、alias 和产物类型），之后构建命令：
+
+```bash
+cordova build android --release -- --storePassword=XXX --password=XXX
+```
+
+构建产物位于`platforms/android/app/build/outputs/apk/release/` 目录下。
 
 ## 致谢
 
