@@ -20,7 +20,11 @@ $(document).ready(function(){
     $('#level-select input[type="radio"]').on('change', function(){
         gameData.level=$(this).val();
     });
-    
+
+    $('#lang-select input[type="radio"]').on('change', function(){
+        i18n.setPref($(this).val());
+    });
+
     $('.back-to-game').on('tap',function(){
         $.mobile.changePage('#game-page');
     });
@@ -61,13 +65,17 @@ $(document).ready(function(){
     
     $('#new-game').page();
     $('#game-won').page();
+    $('#help-page').page();
     gameData.load();
+    $('#lang-select input[value="'+i18n.getPref()+'"]').attr('checked', true);
+    $('#lang-select input[type="radio"]').checkboxradio('refresh');
     $('.back-to-game').button('disable');
+    i18n.refreshDom();
     $.mobile.changePage('#new-game',{changeHash: false});
 
     window.gameInfo = (function(){
         var blinking = false,
-            text = "",
+            currentKey = "",
             color = "";
 
         var self = {};
@@ -89,13 +97,13 @@ $(document).ready(function(){
         };
 
         self.getText = function(){
-            return text;
+            return currentKey ? i18n.t(currentKey) : "";
         };
 
         var textObj = $("#game-info>.cont");
-        self.setText = function(val){
-            text = val;
-            textObj.html(val);
+        self.setText = function(key){
+            currentKey = key;
+            textObj.attr('data-i18n', key).html(i18n.t(key));
         };
 
         self.getColor = function(){
@@ -116,23 +124,23 @@ $(document).ready(function(){
 
 function showWinDialog(game){
     gameInfo.setBlinking(false);
+    var titleKey, descKey;
     if(game.mode === 'hvh'){
-        var who=(function(string){ return string.charAt(0).toUpperCase() + string.slice(1);})(game.getCurrentPlayer().color);
-        $("#game-won h4").html(who+' Won!');
-        gameInfo.value=who+' won.'
-        $("#win-content").html(who+' won the game. Play again?');
+        var color = game.getCurrentPlayer().color;
+        titleKey = 'result.colorWin.' + color + '.title';
+        descKey = 'result.colorWin.' + color + '.desc';
         $('#happy-outer').fadeIn(500);
     }else{
         if(game.getCurrentPlayer() instanceof HumanPlayer){
-            $("#game-won h4").html('You Won!');
-            $("#win-content").html('You won the game. Play again?');
-            gameInfo.value='You won.'
+            titleKey = 'result.youWin.title';
+            descKey = 'result.youWin.desc';
             $('#sad-outer').fadeIn(500);
         }else{
-            $("#game-won h4").html('You Lost.');
-            $("#win-content").html('Meh. You lost to the computer. Play again?');
-            gameInfo.value='Computer won.'
+            titleKey = 'result.youLost.title';
+            descKey = 'result.youLost.desc';
             $('#happy-outer').fadeIn(500);
         }
     }
+    $("#game-won h4").attr('data-i18n', titleKey).html(i18n.t(titleKey));
+    $("#win-content").attr('data-i18n', descKey).html(i18n.t(descKey));
 }
