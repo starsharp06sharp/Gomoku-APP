@@ -16,6 +16,7 @@
 - 同时支持鼠标点击与触摸操作
 - 横屏锁定，移动端布局优化
 - 界面基于 jQuery Mobile 实现
+- 多语言界面：简体中文、繁體中文（香港）、繁體中文（台灣）、English，并支持「跟随系统」
 
 ## 技术栈
 
@@ -32,7 +33,7 @@
 ├── package.json        # 项目与 Cordova 插件依赖
 ├── www/                # Web 资源（Cordova 入口）
 │   ├── index.html
-│   ├── js/             # 棋盘、玩家、AI Worker、界面逻辑等
+│   ├── js/             # 棋盘、玩家、AI Worker、i18n、界面逻辑等
 │   ├── style/
 │   └── images/
 └── README.md
