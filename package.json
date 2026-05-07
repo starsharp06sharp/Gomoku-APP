@@ -1,7 +1,7 @@
 {
   "name": "starsharp06sharp.gomoku",
   "displayName": "Gomoku",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A offline Gomoku Game APP.",
   "main": "index.js",
   "scripts": {
