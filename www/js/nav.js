@@ -16,11 +16,6 @@ var nav = (function(){
             if (dialogStack.length > 0) mask.classList.add('visible');
             else mask.classList.remove('visible');
         }
-        // Hide the underlying page while any dialog is open, mirroring
-        // jQuery Mobile's "dialog replaces page" behavior. The body class
-        // is consumed by CSS to suppress .page.active rendering.
-        if (dialogStack.length > 0) document.body.classList.add('has-dialog');
-        else document.body.classList.remove('has-dialog');
     }
 
     function show(pageId){

@@ -477,15 +477,6 @@ table.board {
 	pointer-events: auto;
 	transition: opacity 0.25s ease, visibility 0s linear 0s;
 }
-/* While a dialog is open the underlying page is hidden so its contents
-   (e.g. the wooden game-region with the chess grid) don't show through
-   the dialog backdrop. */
-body.has-dialog .page.active {
-	visibility: hidden;
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 0.2s ease, visibility 0s linear 0.2s;
-}
 .page-content {
 	width: 100%;
 	height: 100%;
