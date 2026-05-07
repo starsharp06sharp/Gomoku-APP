@@ -108,7 +108,22 @@
 
 }
 
+/* Inherited from jQuery Mobile's reset (originally on `.ui-mobile` /
+   `.ui-mobile-viewport` classes that jQM added to html/body at runtime).
+   Constraining body height to ~viewport height is what kept the body's
+   background-positioning area at viewport size, which in turn kept the
+   woodfloor.jpg from tiling vertically into the visible area and made
+   the radial vignette below render the way the original app looked. */
+html, body {
+	height: 99.9%;
+}
+
 body {
+	margin: 0;
+	overflow-x: hidden;
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 	font-family: Helvetica,Arial,sans-serif;
 	background: url(woodfloor.jpg);
 
@@ -315,7 +330,7 @@ table.board {
 #game-info>.go {
 	border-radius: 1000px;
 	display: block;
-	float: left;
+	flex: 0 0 auto;
 	height: 1em;
 	width: 1em;
 	margin-right: 0.2em;
@@ -329,6 +344,8 @@ table.board {
 }
 
 #game-info {
+	display: flex;
+	align-items: center;
 	text-align: left;
 	text-shadow: none;
 	font-size: 1.1em;
@@ -460,6 +477,15 @@ table.board {
 	pointer-events: auto;
 	transition: opacity 0.25s ease, visibility 0s linear 0s;
 }
+/* While a dialog is open the underlying page is hidden so its contents
+   (e.g. the wooden game-region with the chess grid) don't show through
+   the dialog backdrop. */
+body.has-dialog .page.active {
+	visibility: hidden;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
 .page-content {
 	width: 100%;
 	height: 100%;
@@ -586,6 +612,41 @@ table.board {
 .btn--secondary:not(:disabled):hover {
 	background: linear-gradient(180deg, #ffffff, #e4e4e4);
 }
+/* Wood-themed buttons. Reproduces jQuery Mobile's `.ui-btn-up-w` /
+   `.ui-btn-hover-w` / `.ui-btn-down-w` triplet exactly:
+     - default : border #c27426 / linear-gradient(#D57F29 -> #AE6822)
+     - hover   : border #DF852B / linear-gradient(#F5922F -> #C87726)
+     - active  : border #DF852B / linear-gradient(#C87726 -> #F5922F)  (reversed)
+   White text with a soft #444 1px shadow underneath. */
+.btn--wood {
+	color: #ffffff;
+	background-color: #c27426;
+	background-image: linear-gradient(180deg, #D57F29, #AE6822);
+	border-color: #c27426;
+	text-shadow: 0 1px 1px #444444;
+	/* Lifted look: a soft outer drop shadow + a thin top inner highlight
+	   to suggest a beveled top edge. The shadow shrinks on press. */
+	box-shadow:
+		0 2px 4px rgba(0, 0, 0, 0.35),
+		inset 0 1px 0 rgba(255, 255, 255, 0.25);
+	transition: background-color 0.15s ease, box-shadow 0.12s ease, transform 0.05s ease;
+}
+.btn--wood:not(:disabled):hover {
+	background-color: #DF852B;
+	background-image: linear-gradient(180deg, #F5922F, #C87726);
+	border-color: #DF852B;
+	box-shadow:
+		0 4px 8px rgba(0, 0, 0, 0.4),
+		inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.btn--wood:not(:disabled):active {
+	background-color: #DF852B;
+	background-image: linear-gradient(180deg, #C87726, #F5922F);
+	border-color: #DF852B;
+	box-shadow:
+		0 1px 2px rgba(0, 0, 0, 0.35),
+		inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
 
 /* Icon decorations using Unicode glyphs (lightweight, no extra assets). */
 .btn--icon-grid::before {
@@ -604,15 +665,21 @@ table.board {
 	font-size: 1em;
 }
 
-/* ===== Control groups (segmented radio button list) ===== */
+/* ===== Control groups (segmented radio buttons) =====
+   Reproduces jQuery Mobile's `data-role="controlgroup"`:
+   - .ctrl-group           -> horizontal segmented (default)
+   - .ctrl-group--vertical -> vertical stacked segmented (used for #lang-select)
+*/
 .ctrl-group {
+	display: flex;
+	flex-wrap: wrap;
 	border: none;
 	margin: 12px 0;
 	padding: 0;
 }
 .ctrl-group legend {
+	flex: 0 0 100%;
 	display: block;
-	width: 100%;
 	margin: 0 0 6px 0;
 	padding: 0;
 	font-size: 0.95em;
@@ -625,9 +692,9 @@ table.board {
 	pointer-events: none;
 }
 .ctrl-group label {
-	display: inline-block;
+	flex: 1 1 0;
 	box-sizing: border-box;
-	padding: 8px 12px;
+	padding: 10px 14px;
 	margin: 0;
 	font-size: 0.95em;
 	font-weight: bold;
@@ -637,7 +704,9 @@ table.board {
 	border-right-width: 0;
 	cursor: pointer;
 	user-select: none;
+	text-align: center;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	transition: background 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
 }
 .ctrl-group label:first-of-type {
 	border-radius: 6px 0 0 6px;
@@ -646,15 +715,72 @@ table.board {
 	border-right-width: 1px;
 	border-radius: 0 6px 6px 0;
 }
+/* Hover / selected highlight is border-only (no background or text-color
+   change) so every group in the dialog gets the same look: a blue ring
+   around the label whose underlying background stays untouched. This
+   keeps the black/white swatches in #color-select reading as actual
+   chess-piece colours while still making the active option obvious. */
+.ctrl-group label:hover {
+	border-color: #4a90c8;
+	box-shadow: 0 0 0 2px rgba(74, 144, 200, 0.55);
+	position: relative;
+	z-index: 1;
+}
 .ctrl-group input[type='radio']:checked + label {
-	color: #fff;
-	background: linear-gradient(180deg, #4a90c8, #2f6a9a);
-	border-color: #224d72;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
+	border-color: #4a90c8;
+	box-shadow:
+		0 0 0 3px #4a90c8 inset,
+		0 0 10px 2px rgba(74, 144, 200, 0.7);
+	position: relative;
+	z-index: 1;
 }
 .ctrl-group input[type='radio']:focus + label {
 	outline: 2px solid rgba(74, 144, 200, 0.5);
 	outline-offset: -2px;
+}
+
+/* Vertical variant: stack labels in a column with shared bottom borders. */
+.ctrl-group--vertical {
+	flex-direction: column;
+}
+.ctrl-group--vertical label {
+	flex: 0 0 auto;
+	width: 100%;
+	border: 1px solid #aaa;
+	border-bottom-width: 0;
+	border-radius: 0;
+}
+.ctrl-group--vertical label:first-of-type {
+	border-radius: 6px 6px 0 0;
+}
+.ctrl-group--vertical label:last-of-type {
+	border-bottom-width: 1px;
+	border-radius: 0 0 6px 6px;
+}
+
+/* Color group: black/white themed swatch labels (replaces jQM data-theme
+   a/c). The hover and selected highlights come from the base .ctrl-group
+   rules above; here we only set the resting backgrounds + text colours
+   and override the default border-color when an interactive state fires
+   (the default rule below has higher specificity than the base hover /
+   checked rules and would otherwise keep the black/grey border visible). */
+#color-select label[for='color-choice-black'] {
+	color: #fff;
+	background: linear-gradient(180deg, #555, #111);
+	border-color: #000;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.7);
+}
+#color-select label[for='color-choice-white'] {
+	color: #222;
+	background: linear-gradient(180deg, #fff, #d0d0d0);
+	border-color: #888;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+#color-select label[for='color-choice-black']:hover,
+#color-select label[for='color-choice-white']:hover,
+#color-select input[type='radio']:checked + label[for='color-choice-black'],
+#color-select input[type='radio']:checked + label[for='color-choice-white'] {
+	border-color: #4a90c8;
 }
 
 /* ===== Layout helpers ===== */
