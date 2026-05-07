@@ -1,57 +1,56 @@
-gameData={
+gameData = {
     prefix: 'yyjhao.gomoku.',
     records: {},
-    addRecord: function(name, defaultVal,applyFunc){
-        this.records[name]=defaultVal;
-        var func;
-        if(!applyFunc){
-            func=function(){};
-        }
-        else{
-            func=applyFunc;
-        }
+    addRecord: function(name, defaultVal, applyFunc){
+        this.records[name] = defaultVal;
+        var func = applyFunc || function(){};
         Object.defineProperty(this, name, {
             get: function(){
-                return localStorage[this.prefix+name];
+                return localStorage[this.prefix + name];
             },
             set: function(val){
                 func(val);
-                localStorage[this.prefix+name] = val;
+                localStorage[this.prefix + name] = val;
             }
         });
     },
     ini: function(){
-        for(var i in this.records){
-            this[i]=this.records[i];
+        for (var i in this.records){
+            this[i] = this.records[i];
         }
     },
     apply: function(){
         for (var i in this.records){
-            this[i]=this[i];
+            this[i] = this[i];
         }
     }
 };
 
-gameData.addRecord('firstTime','firstTime');
+function selectRadio(groupId, val){
+    var el = document.querySelector('#' + groupId + ' input[value="' + val + '"]');
+    if (el) el.checked = true;
+}
+
+gameData.addRecord('firstTime', 'firstTime');
 
 gameData.addRecord('mode', 'vscomputer', function(val){
-    $('#mode-select input[value="'+val+'"]').attr('checked',true);
-    $('#mode-select input[type="radio"]').checkboxradio('refresh');
-    if(val=='vshuman'){
-        $('.vs-computer').hide();
-    }else $('.vs-computer').show();
-});
-gameData.addRecord('color', 'black', function(val){
-    $('#color-select input[value="'+val+'"]').attr('checked',true);
-    $('#color-select input[type="radio"]').checkboxradio('refresh');
-});
-gameData.addRecord('level', 'medium', function(val){
-    $('#level-select input[value="'+val+'"]').attr('checked',true);
-    $('#level-select input[type="radio"]').checkboxradio('refresh');
+    selectRadio('mode-select', val);
+    var nodes = document.querySelectorAll('.vs-computer');
+    for (var i = 0; i < nodes.length; i++){
+        nodes[i].style.display = (val === 'vshuman') ? 'none' : '';
+    }
 });
 
-gameData.load=function(){
-    if(!this.firstTime){
+gameData.addRecord('color', 'black', function(val){
+    selectRadio('color-select', val);
+});
+
+gameData.addRecord('level', 'medium', function(val){
+    selectRadio('level-select', val);
+});
+
+gameData.load = function(){
+    if (!this.firstTime){
         this.ini();
     }
     this.apply();

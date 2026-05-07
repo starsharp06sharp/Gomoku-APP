@@ -233,27 +233,11 @@ var i18n = (function(){
     }
 
     // Refresh all elements that have a `data-i18n="key"` attribute.
-    // jQuery Mobile mutates the DOM during enhancement, so a few cases need special handling:
-    //   - controlgroup <fieldset>: the <legend> is removed and its text is mirrored into a
-    //     new `.ui-controlgroup-label` sibling. Keep data-i18n on the fieldset and update
-    //     the label (or the still-present legend before enhancement).
-    //   - enhanced buttons/labels: the visible text lives inside `.ui-btn-text`.
     function refreshDom(){
-        $('[data-i18n]').each(function(){
-            var $el = $(this);
-            var html = t($el.attr('data-i18n'));
-
-            if($el.is('fieldset')){
-                var $label = $el.find('.ui-controlgroup-label').first();
-                if($label.length) $label.html(html);
-                else $el.children('legend').first().html(html);
-                return;
-            }
-
-            var $btn = $el.find('.ui-btn-text').first();
-            if($btn.length) $btn.html(html);
-            else $el.html(html);
-        });
+        var nodes = document.querySelectorAll('[data-i18n]');
+        for (var i = 0; i < nodes.length; i++){
+            nodes[i].innerHTML = t(nodes[i].getAttribute('data-i18n'));
+        }
         document.title = t('appTitle');
         document.documentElement.lang = currentLang;
     }

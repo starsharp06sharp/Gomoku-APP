@@ -1,82 +1,111 @@
-$(document).ready(function(){
-    var game = new Game($(".go-board"), $(".board tbody"));
+document.addEventListener('DOMContentLoaded', function(){
+    var game = new Game(document.querySelector('.go-board'), document.querySelector('.board tbody'));
 
     var adjustSize = adjustSizeGen();
 
-    $(window).resize(adjustSize);
+    window.addEventListener('resize', adjustSize);
 
     adjustSize();
-    $.mobile.defaultDialogTransition = 'flip';
-    $.mobile.defaultPageTransition = 'flip';
-    
-    $('#mode-select input[type="radio"]').on('change', function(){
-        gameData.mode=$(this).val();
-    });
-    
-    $('#color-select input[type="radio"]').on('change', function(){
-        gameData.color=$(this).val();
-    });
-    
-    $('#level-select input[type="radio"]').on('change', function(){
-        gameData.level=$(this).val();
+
+    function onChange(selector, fn){
+        var nodes = document.querySelectorAll(selector);
+        for (var i = 0; i < nodes.length; i++){
+            nodes[i].addEventListener('change', fn);
+        }
+    }
+
+    function onClick(selector, fn){
+        var nodes = document.querySelectorAll(selector);
+        for (var i = 0; i < nodes.length; i++){
+            nodes[i].addEventListener('click', fn);
+        }
+    }
+
+    onChange('#mode-select input[type="radio"]', function(){
+        gameData.mode = this.value;
     });
 
-    $('#lang-select input[type="radio"]').on('change', function(){
-        i18n.setPref($(this).val());
+    onChange('#color-select input[type="radio"]', function(){
+        gameData.color = this.value;
     });
 
-    $('.back-to-game').on('tap',function(){
-        $.mobile.changePage('#game-page');
+    onChange('#level-select input[type="radio"]', function(){
+        gameData.level = this.value;
     });
-    
-    $("#start-game").on('click',function(){
-        try{
+
+    onChange('#lang-select input[type="radio"]', function(){
+        i18n.setPref(this.value);
+    });
+
+    onClick('.back-to-game', function(){
+        nav.closeAll();
+        nav.show('game-page');
+    });
+
+    onClick('.open-new-game', function(){
+        nav.openDialog('new-game');
+    });
+
+    onClick('.open-help', function(){
+        nav.openDialog('help-page');
+    });
+
+    document.getElementById('start-game').addEventListener('click', function(){
+        try {
             game.white.worker.terminate();
             game.black.worker.terminate();
-        }catch(e){}
-        if(gameData.mode==='vshuman'){
-            game.mode='hvh';
-            game.init(new HumanPlayer("black"), new HumanPlayer("white"));
-        }else{
+        } catch (e) {}
+        if (gameData.mode === 'vshuman'){
+            game.mode = 'hvh';
+            game.init(new HumanPlayer('black'), new HumanPlayer('white'));
+        } else {
             var color, other;
-            if(gameData.color==='black'){
-                color='black';
-                other='white';
-            }else{
-                color='white';
-                other='black';
+            if (gameData.color === 'black'){
+                color = 'black';
+                other = 'white';
+            } else {
+                color = 'white';
+                other = 'black';
             }
-            game.mode=gameData.level;
+            game.mode = gameData.level;
             game.init(new HumanPlayer(color), new AIPlayer(game.mode, other));
         }
-        $.mobile.changePage('#game-page');
+        nav.closeAll();
+        nav.show('game-page');
         game.start();
-        setTimeout(function(){$('.back-to-game').button('enable');},100);
+        setTimeout(function(){
+            var nodes = document.querySelectorAll('.back-to-game');
+            for (var i = 0; i < nodes.length; i++) nodes[i].disabled = false;
+        }, 100);
     });
 
-    $("#undo-button").on('tap', function(){
+    document.getElementById('undo-button').addEventListener('click', function(){
         game.undo();
     });
-    
-    $('.fullscreen-wrapper').on('tap', function(){
-        $(this).hide();
-        $.mobile.changePage('#game-won');
-    });
-    
-    $('#new-game').page();
-    $('#game-won').page();
-    $('#help-page').page();
+
+    var faceWrappers = document.querySelectorAll('.fullscreen-wrapper');
+    for (var i = 0; i < faceWrappers.length; i++){
+        faceWrappers[i].addEventListener('click', function(e){
+            hideFace(e.currentTarget);
+            nav.openDialog('game-won');
+        });
+    }
+
     gameData.load();
-    $('#lang-select input[value="'+i18n.getPref()+'"]').attr('checked', true);
-    $('#lang-select input[type="radio"]').checkboxradio('refresh');
-    $('.back-to-game').button('disable');
+    var langInput = document.querySelector('#lang-select input[value="' + i18n.getPref() + '"]');
+    if (langInput) langInput.checked = true;
+
+    var backButtons = document.querySelectorAll('.back-to-game');
+    for (var j = 0; j < backButtons.length; j++) backButtons[j].disabled = true;
+
     i18n.refreshDom();
-    $.mobile.changePage('#new-game',{changeHash: false});
+    nav.show('game-page');
+    nav.openDialog('new-game');
 
     window.gameInfo = (function(){
         var blinking = false,
-            currentKey = "",
-            color = "";
+            currentKey = '',
+            color = '';
 
         var self = {};
 
@@ -84,63 +113,78 @@ $(document).ready(function(){
             return blinking;
         };
 
-        var mainObj = $("#game-info");
+        var mainObj = document.getElementById('game-info');
         self.setBlinking = function(val){
-            if(val !== blinking){
+            if (val !== blinking){
                 blinking = val;
-                if(val){
-                    mainObj.addClass("blinking");
-                }else{
-                    mainObj.removeClass("blinking");
-                }
+                if (val) mainObj.classList.add('blinking');
+                else mainObj.classList.remove('blinking');
             }
         };
 
         self.getText = function(){
-            return currentKey ? i18n.t(currentKey) : "";
+            return currentKey ? i18n.t(currentKey) : '';
         };
 
-        var textObj = $("#game-info>.cont");
+        var textObj = document.querySelector('#game-info > .cont');
         self.setText = function(key){
             currentKey = key;
-            textObj.attr('data-i18n', key).html(i18n.t(key));
+            textObj.setAttribute('data-i18n', key);
+            textObj.innerHTML = i18n.t(key);
         };
 
         self.getColor = function(){
             return color;
         };
 
-        var colorObj = $("#game-info>.go");
-        self.setColor = function(color){
-            colorObj.removeClass("white").removeClass("black");
-            if(color){
-                colorObj.addClass(color);
-            }
+        var colorObj = document.querySelector('#game-info > .go');
+        self.setColor = function(c){
+            color = c;
+            colorObj.classList.remove('white');
+            colorObj.classList.remove('black');
+            if (c) colorObj.classList.add(c);
         };
 
         return self;
     })();
 });
 
+// Show a fullscreen face overlay with a CSS opacity transition.
+function showFace(el){
+    el.style.display = 'block';
+    // Force a reflow so the next class change triggers a transition.
+    void el.offsetWidth;
+    el.classList.add('show');
+}
+
+function hideFace(el){
+    el.classList.remove('show');
+    el.style.display = 'none';
+}
+
 function showWinDialog(game){
     gameInfo.setBlinking(false);
     var titleKey, descKey;
-    if(game.mode === 'hvh'){
+    if (game.mode === 'hvh'){
         var color = game.getCurrentPlayer().color;
         titleKey = 'result.colorWin.' + color + '.title';
         descKey = 'result.colorWin.' + color + '.desc';
-        $('#happy-outer').fadeIn(500);
-    }else{
-        if(game.getCurrentPlayer() instanceof HumanPlayer){
+        showFace(document.getElementById('happy-outer'));
+    } else {
+        if (game.getCurrentPlayer() instanceof HumanPlayer){
             titleKey = 'result.youWin.title';
             descKey = 'result.youWin.desc';
-            $('#sad-outer').fadeIn(500);
-        }else{
+            showFace(document.getElementById('sad-outer'));
+        } else {
             titleKey = 'result.youLost.title';
             descKey = 'result.youLost.desc';
-            $('#happy-outer').fadeIn(500);
+            showFace(document.getElementById('happy-outer'));
         }
     }
-    $("#game-won h4").attr('data-i18n', titleKey).html(i18n.t(titleKey));
-    $("#win-content").attr('data-i18n', descKey).html(i18n.t(descKey));
+    var titleEl = document.querySelector('#game-won h4');
+    titleEl.setAttribute('data-i18n', titleKey);
+    titleEl.innerHTML = i18n.t(titleKey);
+    var descEl = document.getElementById('win-content');
+    descEl.setAttribute('data-i18n', descKey);
+    descEl.innerHTML = i18n.t(descKey);
 }

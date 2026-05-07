@@ -13,14 +13,10 @@
 
 	<title>Gomoku</title>
 
-	<link rel="stylesheet" href="style/jquery.mobile-1.2.0.min.css" />
-	<script src="js/jquery-1.8.2.min.js"></script>
-	<script src="js/jquery.mobile-1.2.0.min.js"></script>
-
-	<link rel="stylesheet" href="style/w.min.css" />
 	<link rel='stylesheet' href='style/style.css' type='text/css'/>
 
 	<script src='js/i18n.js' type='text/javascript'></script>
+	<script src='js/nav.js' type='text/javascript'></script>
 	<script src='js/Player.js' type='text/javascript'></script>
 	<script src='js/Board.js' type='text/javascript'></script>
 	<script src='js/Game.js' type='text/javascript'></script>
@@ -35,25 +31,28 @@
 <div class='fullscreen-wrapper' id='sad-outer'>
 	<img src='images/sad.png' class='sad-face screen-center'>
 </div>
-<div data-role='page' data-theme='w' id='game-page' class='no-background'>
-	<div data-role='content' class='center no-padding'>
+
+<div id='dialog-mask'></div>
+
+<div class='page no-background' id='game-page'>
+	<div class='page-content center no-padding'>
 		<div id='game-region'>
 			<header class='game-ult' data-i18n='appTitle'>Gomoku</header>
-			<div id='game-info' class='game-ult ui-bar ui-bar-e'>
+			<div id='game-info' class='game-ult info-bar'>
 				<span class='go black'></span>
 				<span class='cont' data-i18n='gameInfo.yourTurn'>Your turn.</span>
 			</div>
 			<div id='main-but-group' class='game-ult'>
-				<a href='#new-game' data-rel='dialog' data-role='button' data-icon="grid" data-i18n='btn.newGame'>New Game</a>
-				<a href='#' id='undo-button' data-icon="back"  data-role='button' data-i18n='btn.undo'>Undo</a>
+				<button class='btn btn--primary btn--icon-grid open-new-game' data-i18n='btn.newGame'>New Game</button>
+				<button class='btn btn--secondary btn--icon-back' id='undo-button' data-i18n='btn.undo'>Undo</button>
 			</div>
 			<div id='other-but-group' class='game-ult'>
-				<a href='#help-page' id='help-button' data-icon="star" data-role='button' data-i18n='btn.about'>About</a>
+				<button class='btn btn--secondary btn--icon-star open-help' id='help-button' data-i18n='btn.about'>About</button>
 			</div>
-			<div class='go-board' data-enhance=false>
+			<div class='go-board'>
 				
 			</div>
-			<table class='board' data-enhance=false>
+			<table class='board'>
 				<tbody>
 					
 				</tbody>
@@ -61,94 +60,96 @@
 		</div>
 	</div>
 </div>
-<div id='game-won' data-theme='e' data-role='dialog'>
-	<div data-role='header'>
-		<h4>You Win!</h4>
+
+<div id='game-won' class='dialog dialog--win'>
+	<div class='dialog-header'>
+		<h4 data-i18n='result.youWin.title'>You Win!</h4>
 	</div>
-	<div data-role='content'>
-		<div id='win-content'>
+	<div class='dialog-content'>
+		<div id='win-content' data-i18n='result.youWin.desc'>
 			You have won the game! Play again?
 		</div>
-		<fieldset class="ui-grid-a">
-			<div class="ui-block-a"><button class='back-to-game'  data-theme='c' data-i18n='btn.back'>Back</button></div>
-			<div class="ui-block-b">
-				<a href='#new-game' data-rel='dialog' data-role='button' data-icon="grid" data-i18n='btn.startNewGame'>
+		<div class='row-2'>
+			<div><button class='btn btn--secondary back-to-game' data-i18n='btn.back'>Back</button></div>
+			<div>
+				<button class='btn btn--primary btn--icon-grid open-new-game' data-i18n='btn.startNewGame'>
 					Start A New Game
-				</a>
-			</div>	   
-		</fieldset>
+				</button>
+			</div>
+		</div>
 	</div>
 </div>
-<div id='new-game'  data-theme='e' data-role='dialog' class='long-dialog'>
-	<div data-role='header'>
+
+<div id='new-game' class='dialog dialog--long'>
+	<div class='dialog-header'>
 		<h4 data-i18n='dialog.newGame.title'>New Game</h4>
 	</div>
-	<div data-role='content'>
-		<fieldset data-role="controlgroup"  data-theme='e' id='mode-select' data-i18n='dialog.newGame.playWith'>
-			<legend>Play with</legend>
-				<input type="radio" name="radio-choice-1" id="radio-choice-1" value="vshuman"/>
-				<label for="radio-choice-1" data-i18n='opt.human'>Human</label>
+	<div class='dialog-content'>
+		<fieldset class='ctrl-group' id='mode-select'>
+			<legend data-i18n='dialog.newGame.playWith'>Play with</legend>
+			<input type="radio" name="mode-choice" id="mode-choice-human" value="vshuman"/>
+			<label for="mode-choice-human" data-i18n='opt.human'>Human</label>
 
-				<input type="radio" name="radio-choice-1" id="radio-choice-2" value="vscomputer"  />
-				<label for="radio-choice-2" data-i18n='opt.computer'>Computer</label>
-		</fieldset> 
-		
-		<fieldset data-role="controlgroup" data-theme='e' id='color-select' class='vs-computer' data-i18n='dialog.newGame.color'>
-			<legend>Your Color</legend>
-				<input type="radio" name="radio-choice-1" id="radio-choice-2" value="black" data-theme='a'  />
-				<label for="radio-choice-2" data-i18n='opt.black'>Black</label>
-				
-				<input type="radio" name="radio-choice-1" id="radio-choice-1" value="white" data-theme='c' />
-				<label for="radio-choice-1" data-i18n='opt.white'>White</label>
-		</fieldset>
-		
-		<fieldset data-role="controlgroup"  data-theme='e' id='level-select'  class='vs-computer' data-i18n='dialog.newGame.level'>
-			<legend>Level Of Difficulty</legend>
-			
-				<input type="radio" name="radio-choice-1" id="radio-choice-1" value="novice" />
-				<label for="radio-choice-1" data-i18n='opt.novice'>Novice</label>
-
-				<input type="radio" name="radio-choice-1" id="radio-choice-2" value="medium"  />
-				<label for="radio-choice-2" data-i18n='opt.medium'>Medium</label>
-
-				<input type="radio" name="radio-choice-1" id="radio-choice-3" value="expert"  />
-				<label for="radio-choice-3" data-i18n='opt.expert'>Expert</label>
-				
+			<input type="radio" name="mode-choice" id="mode-choice-computer" value="vscomputer"/>
+			<label for="mode-choice-computer" data-i18n='opt.computer'>Computer</label>
 		</fieldset>
 
-		<fieldset data-role="controlgroup"  data-theme='e' id='lang-select' data-i18n='dialog.newGame.language'>
-			<legend>Language</legend>
+		<fieldset class='ctrl-group vs-computer' id='color-select'>
+			<legend data-i18n='dialog.newGame.color'>Your Color</legend>
+			<input type="radio" name="color-choice" id="color-choice-black" value="black"/>
+			<label for="color-choice-black" data-i18n='opt.black'>Black</label>
 
-				<input type="radio" name="lang-choice" id="lang-choice-system" value="system" />
-				<label for="lang-choice-system" data-i18n='opt.lang.system'>Follow system</label>
-
-				<input type="radio" name="lang-choice" id="lang-choice-zh-cn" value="zh-CN" />
-				<label for="lang-choice-zh-cn" data-i18n='opt.lang.zh-CN'>简体中文</label>
-
-				<input type="radio" name="lang-choice" id="lang-choice-zh-hk" value="zh-HK" />
-				<label for="lang-choice-zh-hk" data-i18n='opt.lang.zh-HK'>繁體中文（香港）</label>
-
-				<input type="radio" name="lang-choice" id="lang-choice-zh-tw" value="zh-TW" />
-				<label for="lang-choice-zh-tw" data-i18n='opt.lang.zh-TW'>繁體中文（台灣）</label>
-
-				<input type="radio" name="lang-choice" id="lang-choice-en" value="en" />
-				<label for="lang-choice-en" data-i18n='opt.lang.en'>English</label>
-
+			<input type="radio" name="color-choice" id="color-choice-white" value="white"/>
+			<label for="color-choice-white" data-i18n='opt.white'>White</label>
 		</fieldset>
 
-		<fieldset class="ui-grid-a">
-			<div class="ui-block-a"><button class='back-to-game'  data-theme='c' data-i18n='btn.back'>Back</button></div>
-			<div class="ui-block-b"><button id='start-game'  data-theme='b' data-i18n='btn.start'>Start</button></div>	   
+		<fieldset class='ctrl-group vs-computer' id='level-select'>
+			<legend data-i18n='dialog.newGame.level'>Level Of Difficulty</legend>
+			<input type="radio" name="level-choice" id="level-choice-novice" value="novice"/>
+			<label for="level-choice-novice" data-i18n='opt.novice'>Novice</label>
+
+			<input type="radio" name="level-choice" id="level-choice-medium" value="medium"/>
+			<label for="level-choice-medium" data-i18n='opt.medium'>Medium</label>
+
+			<input type="radio" name="level-choice" id="level-choice-expert" value="expert"/>
+			<label for="level-choice-expert" data-i18n='opt.expert'>Expert</label>
 		</fieldset>
+
+		<fieldset class='ctrl-group' id='lang-select'>
+			<legend data-i18n='dialog.newGame.language'>Language</legend>
+
+			<input type="radio" name="lang-choice" id="lang-choice-system" value="system"/>
+			<label for="lang-choice-system" data-i18n='opt.lang.system'>Follow system</label>
+
+			<input type="radio" name="lang-choice" id="lang-choice-zh-cn" value="zh-CN"/>
+			<label for="lang-choice-zh-cn" data-i18n='opt.lang.zh-CN'>简体中文</label>
+
+			<input type="radio" name="lang-choice" id="lang-choice-zh-hk" value="zh-HK"/>
+			<label for="lang-choice-zh-hk" data-i18n='opt.lang.zh-HK'>繁體中文（香港）</label>
+
+			<input type="radio" name="lang-choice" id="lang-choice-zh-tw" value="zh-TW"/>
+			<label for="lang-choice-zh-tw" data-i18n='opt.lang.zh-TW'>繁體中文（台灣）</label>
+
+			<input type="radio" name="lang-choice" id="lang-choice-en" value="en"/>
+			<label for="lang-choice-en" data-i18n='opt.lang.en'>English</label>
+		</fieldset>
+
+		<div class='row-2'>
+			<div><button class='btn btn--secondary back-to-game' data-i18n='btn.back'>Back</button></div>
+			<div><button class='btn btn--primary' id='start-game' data-i18n='btn.start'>Start</button></div>
+		</div>
 	</div>
 </div>
 
-<div data-role='dialog' data-theme='e' id='help-page'>
-	<div data-role='header'>
+<div id='help-page' class='dialog'>
+	<div class='dialog-header'>
 		<h4 data-i18n='about.title'>About</h4>
 	</div>
-	<div data-role='content' class='thin-content' data-i18n='about.content'>
+	<div class='dialog-content thin-content' data-i18n='about.content'>
 		<p>An offline Gomoku app with HTML5 Web Worker AI.</p>
+	</div>
+	<div class='dialog-footer'>
+		<button class='btn btn--secondary back-to-game' data-i18n='btn.back'>Back</button>
 	</div>
 </div>
 </body>

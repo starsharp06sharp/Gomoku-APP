@@ -15,14 +15,14 @@
 - AI 计算运行在 HTML5 Web Worker 中，与界面线程并行，不阻塞 UI
 - 同时支持鼠标点击与触摸操作
 - 横屏锁定，移动端布局优化
-- 界面基于 jQuery Mobile 实现
+- 界面基于原生 HTML/CSS/JS 实现，零运行时依赖
 - 多语言界面：简体中文、繁體中文（香港）、繁體中文（台灣）、English，并支持「跟随系统」
 
 ## 技术栈
 
 - [Apache Cordova](https://cordova.apache.org/)（`cordova-android`、`cordova-browser`）
 - `cordova-plugin-screen-orientation`（横屏锁定）
-- HTML5 / CSS3 / JavaScript（jQuery、jQuery Mobile）
+- HTML5 / CSS3 / JavaScript（原生，无任何前端框架/库依赖）
 - HTML5 Web Worker（用于 AI 后台计算）
 
 ## 目录结构

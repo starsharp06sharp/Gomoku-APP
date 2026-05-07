@@ -35,31 +35,35 @@ function Place(r, c, board){
     elm.onclick = function(){
         board.clicked(r, c);
     };
-    elm = $(elm);
     this.elm = elm;
     this.isSet = false;
 }
 
 Place.prototype.set = function(color){
-    this.elm.addClass("set").addClass(color).removeClass("warning");
+    this.elm.classList.add("set");
+    this.elm.classList.add(color);
+    this.elm.classList.remove("warning");
     this.isSet = true;
 };
 
 Place.prototype.unset = function(){
-    this.elm.removeClass("black").removeClass("white").removeClass("set").removeClass("last-move");
+    this.elm.classList.remove("black");
+    this.elm.classList.remove("white");
+    this.elm.classList.remove("set");
+    this.elm.classList.remove("last-move");
     this.isSet = false;
 };
 
 Place.prototype.highlight = function(){
-    this.elm.addClass("last-move");
+    this.elm.classList.add("last-move");
 };
 
 Place.prototype.warns = function(){
-    this.elm.addClass("warning");
+    this.elm.classList.add("warning");
 };
 
 Place.prototype.unwarns = function(){
-    this.elm.removeClass("warning");
+    this.elm.classList.remove("warning");
 };
 
 var Board = function(boardElm, backgroundElm){
@@ -71,7 +75,7 @@ var Board = function(boardElm, backgroundElm){
         }
         frag.appendChild(row);
     }
-    backgroundElm.append(frag);
+    backgroundElm.appendChild(frag);
 
 
     var self = this;
@@ -100,14 +104,14 @@ var Board = function(boardElm, backgroundElm){
         places.push([]);
         for(var c = 0; c < 15; c++){
             places[r].push(new Place(r, c, this));
-            frag.appendChild(places[r][c].elm[0]);
+            frag.appendChild(places[r][c].elm);
         }
     }
     [[7, 7],[3, 3], [3, 11], [11, 3], [11, 11]].forEach(function(e){
-        places[e[0]][e[1]].elm.addClass("go-darkdot");
+        places[e[0]][e[1]].elm.classList.add("go-darkdot");
     });
 
-    boardElm.append(frag);
+    boardElm.appendChild(frag);
     (function(){
         for (var i=0;i<2;i++){
             var tmp=[];
@@ -130,12 +134,14 @@ var Board = function(boardElm, backgroundElm){
     this.setClickable = function(yes, color){
         clickable = yes;
         if(yes){
-            boardElm.addClass("playing");
+            boardElm.classList.add("playing");
         }else{
-            boardElm.removeClass("playing");
+            boardElm.classList.remove("playing");
         }
         if(color){
-            boardElm.removeClass("black").removeClass("white").addClass(color);
+            boardElm.classList.remove("black");
+            boardElm.classList.remove("white");
+            boardElm.classList.add(color);
         }
     };
 
@@ -156,11 +162,13 @@ var Board = function(boardElm, backgroundElm){
     };
 
     this.unHighlight = function(){
-        $(".last-move").removeClass("last-move");
+        var nodes = document.querySelectorAll(".last-move");
+        for(var i = 0; i < nodes.length; i++) nodes[i].classList.remove("last-move");
     };
 
     this.winChange = function(r, c, color){
-        boardElm.find(".warning").removeClass("warning");
+        var warningNodes = boardElm.querySelectorAll(".warning");
+        for(var w = 0; w < warningNodes.length; w++) warningNodes[w].classList.remove("warning");
         var num = colorToNum[color],
             dir;
         for(var i = 0; i < 4; i++){
@@ -169,11 +177,12 @@ var Board = function(boardElm, backgroundElm){
                 break;
             }
         }
-        $(".go-place").css("opacity", 0.5);
+        var allPlaces = document.querySelectorAll(".go-place");
+        for(var p = 0; p < allPlaces.length; p++) allPlaces[p].style.opacity = "0.5";
         for(var i = -1; i < 2; i += 2){
             var rr = r, cc = c;
             do{
-                places[rr][cc].elm.css("opacity", 1);
+                places[rr][cc].elm.style.opacity = "1";
                 rr += moves[dir][0] * i;
                 cc += moves[dir][1] * i;
             }while(rr >= 0 && rr < 15 && cc >= 0 && cc < 15 && map[num][dir][rr][cc] == -num);
@@ -181,7 +190,8 @@ var Board = function(boardElm, backgroundElm){
     };
 
     this.clearWin = function(){
-        boardElm.find(".go-place").css("opacity", "");
+        var nodes = boardElm.querySelectorAll(".go-place");
+        for(var i = 0; i < nodes.length; i++) nodes[i].style.opacity = "";
     };
 
     this.isSet = function(r, c){
@@ -202,8 +212,10 @@ var Board = function(boardElm, backgroundElm){
     };
 
     this.init = function(){
-        boardElm.find(".warning").removeClass("warning");
-        boardElm.find(".go-place").css("opacity", "");
+        var warnings = boardElm.querySelectorAll(".warning");
+        for(var w = 0; w < warnings.length; w++) warnings[w].classList.remove("warning");
+        var goPlaces = boardElm.querySelectorAll(".go-place");
+        for(var g = 0; g < goPlaces.length; g++) goPlaces[g].style.opacity = "";
         this.unHighlight();
         setNum = 0;
         map.forEach(function(color){
