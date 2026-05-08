@@ -1,10 +1,18 @@
 """Render the Gomoku app launcher icon.
 
-Produces a 512x512 PNG master plus 6 Android-density variants, all written
-to the output directory (default: ``www/images``). Run from the repo root:
+Outputs (all under ``res/icon/``):
 
-    python3 scripts/make_icon.py                # writes www/images/icon*.png
-    python3 scripts/make_icon.py /tmp/icons     # custom output directory
+* ``icon.png`` -- 512x512 high-resolution master, kept in the repo as the
+  authoritative source. NOT shipped in the APK (no entry in ``config.xml``).
+* ``icon-{ldpi,mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}.png`` -- 6 Android launcher
+  density variants wired into the APK via ``config.xml``'s
+  ``<icon density=...>`` entries; cordova-android copies them into
+  ``res/mipmap-*``. They deliberately live outside ``www/`` so they are NOT
+  also bundled into ``assets/www/`` of the APK.
+
+Run from the repo root:
+
+    python3 scripts/make_icon.py
 
 Design: 4 alternating Go stones (B/W/W/B) sitting on the 4 intersections
 of a "#"-shaped grid, on a wood-floor background. There is no outer board
@@ -52,6 +60,7 @@ WOOD_TEXTURE = "www/style/woodfloor.jpg"
 WOOD_DARKEN = 0.18
 STONE_FILL_RATIO = 0.76
 
+ANDROID_ICON_DIR = "res/icon"
 ANDROID_DENSITIES = {
     "ldpi": 36,
     "mdpi": 48,
@@ -162,21 +171,24 @@ def render_master() -> Image.Image:
     return img
 
 
-def main(out_dir: str) -> None:
-    os.makedirs(out_dir, exist_ok=True)
+def _save(img: Image.Image, path: str, size: int) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    resized = img if img.size == (size, size) else img.resize((size, size), Image.LANCZOS)
+    resized.save(path, "PNG", optimize=True)
+    print(f"wrote {path} ({size}x{size} RGBA)")
 
+
+def main() -> None:
     master = render_master()
-    master_path = os.path.join(out_dir, "icon.png")
-    master.save(master_path, "PNG", optimize=True)
-    print(f"wrote {master_path} ({SIZE}x{SIZE} RGBA)")
-
+    _save(master, os.path.join(ANDROID_ICON_DIR, "icon.png"), SIZE)
     for name, sz in ANDROID_DENSITIES.items():
-        resized = master.resize((sz, sz), Image.LANCZOS)
-        path = os.path.join(out_dir, f"icon-{name}.png")
-        resized.save(path, "PNG", optimize=True)
-        print(f"wrote {path} ({sz}x{sz} RGBA)")
+        _save(master, os.path.join(ANDROID_ICON_DIR, f"icon-{name}.png"), sz)
 
 
 if __name__ == "__main__":
-    out_dir = sys.argv[1] if len(sys.argv) > 1 else "www/images"
-    main(out_dir)
+    if len(sys.argv) > 1:
+        sys.exit(
+            "make_icon.py no longer takes a positional output directory; "
+            "edit ANDROID_ICON_DIR in this file instead."
+        )
+    main()
